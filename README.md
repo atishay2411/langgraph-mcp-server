@@ -1,72 +1,91 @@
-# MCP Server 
+# MCP Server using LangGraph
 
-`mcplanggraph` is a Python project that integrates [LangGraph](https://python.langgraph.dev/), [LangChain](https://www.langchain.com/), and [MCP](https://github.com/langchain-ai/langchain) (Model Context Protocol) to build powerful language model workflows with Groq LLM backend support.
+`mcplanggraph` is a Python project that integrates [LangGraph](https://python.langgraph.dev/), [LangChain](https://www.langchain.com/), and [MCP](https://en.wikipedia.org/wiki/Model_Context_Protocol) (Model Context Protocol) to build powerful language model workflows with Groq LLM backend support.
 
 ## Overview
 
-This project provides infrastructure to define and manage complex LLM-based workflows using LangGraph and coordinate model interaction via MCP. It also integrates with `langchain-groq`, enabling use of Groq’s language models within these workflows.
+This project enables coordination between multiple LLM-powered tools using MCP, Groq-backed LangChain agents, and LangGraph orchestration. It includes working tool servers, a LangChain agent client, and integration with Groq.
+
+## What is Model Context Protocol (MCP)?
+
+The **Model Context Protocol (MCP)** is an open standard designed to enable seamless communication between LLM-based applications and external tools, data sources, or services. Introduced in 2024, it is built on top of JSON-RPC 2.0 and enables tools to be discovered, described, and invoked in a standardized way.
+
+Key features of MCP:
+- Standardizes tool/plugin interaction across different LLM ecosystems.
+- Supports both local (stdio) and remote (streamable HTTP) transport layers.
+- Enables dynamic tool discovery and usage at runtime.
+- Facilitates chaining and coordination of multiple tools.
+
+This protocol allows an LLM agent to invoke tools like math operations or weather services programmatically without hardcoding logic for each integration.
 
 ## Project Structure
 
 ```plaintext
 mcplanggraph/
-├── requirements.txt        # Project dependencies
-├── uv.lock                 # Lock file managed by the uv package manager (Python ≥3.13)
+├── client.py              # LangChain+Groq agent client using MCP tools
+├── mathserver.py          # Math MCP tool server using stdio
+├── weather.py             # Weather MCP tool server using HTTP
+├── main.py                # Simple entrypoint script
+├── requirements.txt       # Basic dependencies (alt to pyproject.toml)
+├── pyproject.toml         # Project metadata and dependencies
+├── .gitignore             # Git ignore rules
+├── .python-version        # Python version pin (3.13)
+└── README.md              # Project documentation
 ```
 
 ## Dependencies
 
-Listed in `requirements.txt`:
-- `langchain-groq`: Groq LLM integration for LangChain
-- `langchain-mcp-adapters`: Adapters for connecting LangChain with MCP
-- `mcp`: Model Coordination Context for orchestrating model calls
-- `langgraph`: Graph-based orchestration engine for language models
+Defined in `pyproject.toml` and `requirements.txt`:
 
-These dependencies allow:
-
-- Building composable LLM workflows (LangGraph)
-- Managing model routing and execution logic (MCP)
-- Using Groq’s LLM backend via LangChain
-- Connecting LangChain tools with MCP-based systems
+- `langchain-groq`: LangChain integration with Groq LLMs
+- `langchain-mcp-adapters`: Bridges LangChain tools with MCP servers
+- `langgraph`: Graph-based workflow orchestrator
+- `mcp`: Model Context Protocol for tool invocation
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python **3.13+** (as defined in `uv.lock`)
-- [uv](https://github.com/astral-sh/uv) — a modern Python package manager
+- Python **3.13+**
+- [uv](https://github.com/astral-sh/uv) (optional for lockfile support)
+- [Groq API key](https://console.groq.com/) in your `.env` file
 
 ### Installation
 
-1. Clone this repo and navigate to the directory:
+```bash
+# Clone the repo
+$ git clone https://github.com/atishay2411/langgraph-mcp-server
+$ cd mcplanggraph
 
-   ```bash
-   git clone <your-repo-url>
-   cd mcplanggraph
-   ```
+# Create a virtual environment
+$ python3.13 -m venv .venv
+$ source .venv/bin/activate
 
-2. Create a virtual environment:
+# Install dependencies
+$ pip install -r requirements.txt
+# Or use pyproject.toml
+$ pip install .
+```
 
-   ```bash
-   python3.13 -m venv venv
-   source venv/bin/activate
-   ```
+Add a `.env` file with:
 
-3. Install dependencies with `uv` (recommended):
+```env
+GROQ_API_KEY=your_api_key_here
+```
 
-   ```bash
-   uv pip install -r requirements.txt
-   ```
+### Running the Example
 
-   Or, using pip:
+Start the weather tool server (HTTP):
+```bash
+python weather.py
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+Run the client (spawns math tool subprocess):
+```bash
+python client.py
+```
 
-### Example Use (Coming Soon)
-
-As the source code isn’t included here, example usage and sample graphs are assumed to be developed separately. Expect modules to define and run LangGraph workflows using Groq-backed LLMs.
+You should see the math and weather responses printed by the agent.
 
 ---
 
@@ -74,17 +93,11 @@ As the source code isn’t included here, example usage and sample graphs are as
 
 | Tool | Purpose |
 |------|---------|
-| **LangGraph** | Composable, stateful LLM-based workflows |
-| **MCP** | Protocol for coordinating model interactions |
-| **LangChain** | Framework for building applications with LLMs |
-| **Groq** | High-performance LLM backend |
-| **uv** | Modern Python dependency manager for reproducibility |
-
-## Notes
-
-- `.DS_Store` and `mcplanggraph.zip` could not be decoded (likely binary/non-text files) — they are not included in this explanation.
-- You must use Python 3.13+ because of how `uv.lock` is defined.
-- Ensure `uv` is installed via `cargo install uv` or refer to [uv installation instructions](https://github.com/astral-sh/uv).
+| **LangGraph** | Stateful LLM workflows |
+| **MCP** | Protocol for tool orchestration |
+| **LangChain** | Framework for LLM apps |
+| **Groq** | High-speed inference backend |
+| **uv** | Fast dependency management |
 
 ---
 
@@ -92,3 +105,6 @@ As the source code isn’t included here, example usage and sample graphs are as
 
 GNU
 
+## Contributing
+
+Feel free to open issues or submit pull requests. Contributions are welcome!
