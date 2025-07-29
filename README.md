@@ -90,5 +90,5 @@ As the source code isn’t included here, example usage and sample graphs are as
 
 ## License
 
-MIT or your preferred license — add one if not already present.
+GNU
 
